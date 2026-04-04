@@ -116,8 +116,8 @@ def get_gssi():
     """Return the full GSSI time series with stress zones.
 
     Returns:
-        200 – [ { "date": "...", "gssi": 0.72, "zone": "HIGH" }, ... ]
-        400 – { "error": "Pipeline has not been executed yet" }
+        200 - [ { "date": "...", "gssi": 0.72, "zone": "HIGH" }, ... ]
+        400 - { "error": "Pipeline has not been executed yet" }
     """
     err = _require_pipeline()
     if err:
@@ -136,14 +136,66 @@ def get_forecast():
     """Return the 3-month forward GSSI forecast.
 
     Returns:
-        200 – [ { "date": "...", "predicted_gssi": 0.65, "zone": "HIGH" }, ... ]
-        400 – { "error": "Pipeline has not been executed yet" }
+        200 - [ { "date": "...", "predicted_gssi": 0.65, "zone": "HIGH" }, ... ]
+        400 - { "error": "Pipeline has not been executed yet" }
     """
     err = _require_pipeline()
     if err:
         return err
 
     return jsonify(_series_to_records(_store["forecast"])), 200
+
+
+@app.route("/dashboard", methods=["GET"])
+def get_dashboard():
+    """Return all data needed by the frontend dashboard in one call.
+
+    Returns component signals, GSSI history, forecast, metrics,
+    and component weight metadata.
+    """
+    err = _require_pipeline()
+    if err:
+        return err
+
+    df = _store["df"].copy()
+
+    # Full signal + GSSI history
+    history = []
+    for date, row in df.iterrows():
+        entry = {"date": date.strftime("%Y-%m-%d")}
+        for col in df.columns:
+            val = row[col]
+            if col == "stress_zone":
+                entry[col] = val
+            else:
+                entry[col] = round(float(val), 4)
+        history.append(entry)
+
+    # Forecast
+    forecast = _series_to_records(_store["forecast"])
+
+    # Component weights
+    from models.gssi_model import GSSI_WEIGHTS
+    weights = {k: round(v, 2) for k, v in GSSI_WEIGHTS.items()}
+
+    # Metrics
+    metrics = _store["metrics"] or {}
+
+    # Current status
+    latest = df.iloc[-1]
+    current = {
+        "date": df.index[-1].strftime("%Y-%m-%d"),
+        "gssi": round(float(latest["gssi"]), 4),
+        "zone": latest["stress_zone"],
+    }
+
+    return jsonify({
+        "current": current,
+        "history": history,
+        "forecast": forecast,
+        "weights": weights,
+        "metrics": metrics,
+    }), 200
 
 
 @app.route("/demo/run-all", methods=["POST"])

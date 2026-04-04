@@ -26,7 +26,7 @@ if str(_API_ROOT) not in sys.path:
     sys.path.insert(0, str(_API_ROOT))
 
 from services.data_pipeline import build_dataset
-from models.gssi_model import GSSIModel
+from models.gssi_model import GSSIModel, GSSI_WEIGHTS
 from models.forecast_model import ForecastModel
 
 # ---------------------------------------------------------------------------
@@ -117,18 +117,31 @@ def run_pipeline(
     _validate_march_2020(df["gssi"])
 
     # ------------------------------------------------------------------
-    # Step 4 — Train autoregressive forecast model on GSSI history
+    # Step 4 — Train two-stage residual forecast model
     # ------------------------------------------------------------------
-    logger.info("=== Step 4: Training autoregressive forecast model ===")
+    logger.info("=== Step 4: Training two-stage residual forecast model ===")
+    component_cols = [c for c in GSSI_WEIGHTS if c in df.columns]
+    comp_df = df[component_cols]
+
     forecast_model = ForecastModel()
-    metrics = forecast_model.train(df["gssi"], test_ratio=test_ratio)
-    logger.info("Model metrics: %s", metrics)
+    metrics = forecast_model.train(
+        comp_df, df["gssi"], weights=GSSI_WEIGHTS, test_ratio=test_ratio,
+    )
+    logger.info(
+        "Selected approach: %s",
+        metrics["recommended_model"],
+    )
+    logger.info("Walk-forward plan: %s", metrics["walk_forward_plan"])
+    logger.info(
+        "Walk-forward summary:\n%s",
+        pd.DataFrame(metrics["summary_metrics"]).to_string(index=False),
+    )
 
     # ------------------------------------------------------------------
     # Step 5 — Generate forward forecast
     # ------------------------------------------------------------------
     logger.info("=== Step 5: Generating %d-month forward forecast ===", n_forecast_months)
-    forecast = forecast_model.predict_next(df["gssi"], n_months=n_forecast_months)
+    forecast = forecast_model.predict_next(comp_df, df["gssi"], n_months=n_forecast_months)
     logger.info("Forecast:\n%s", forecast.to_string())
 
     logger.info("=== Pipeline complete ===")
@@ -173,6 +186,10 @@ if __name__ == "__main__":
     print("\n--- 3-Month Forecast ---")
     print(results["forecast"].to_string())
     print("\n--- Model Metrics ---")
-    for k, v in results["model_metrics"].items():
-        print(f"  {k}: {v}")
+    print(
+        pd.DataFrame(results["model_metrics"]["summary_metrics"]).to_string(index=False)
+    )
+    print("\n--- Recommended Model ---")
+    print(f"  model: {results['model_metrics']['recommended_model']}")
+    print(f"  plan: {results['model_metrics']['walk_forward_plan']}")
 
