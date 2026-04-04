@@ -206,8 +206,8 @@ def demo_run_all():
     key ``"api_key"``.
 
     Returns:
-        200 – { "current": { "date", "gssi", "zone" }, "forecast": [...] }
-        500 – { "error": "<message>" }
+        200 - { "current": { "date", "gssi", "zone" }, "forecast": [...] }
+        500 - { "error": "<message>" }
     """
     body = request.get_json(silent=True) or {}
     api_key = body.get("api_key") or os.environ.get("FRED_API_KEY", "")
