@@ -1,4 +1,4 @@
-import { Activity } from "lucide-react";
+import Image from "next/image";
 import { ZONE_LABELS } from "../lib/constants";
 import { fmtDate, zoneColor } from "../lib/helpers";
 import type { DashboardData } from "../lib/types";
@@ -9,7 +9,8 @@ export function Header({ data }: { data: DashboardData }) {
   return (
     <header className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
       <div className="flex items-center gap-3">
-        <Activity className="h-7 w-7 text-blue-500" />
+        <Image src="/LogoGSSI.png" alt="GSSI Logo" width={40} height={40} className="logo-dark" />
+        <Image src="/LogoGSSILight.png" alt="GSSI Logo" width={40} height={40} className="logo-light" />
         <div>
           <h1 className="text-xl font-bold tracking-tight text-foreground">
             Global Supply Chain Stress Index

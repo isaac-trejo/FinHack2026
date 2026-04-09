@@ -7,6 +7,7 @@ import {
   Tooltip,
   ResponsiveContainer,
   ReferenceLine,
+  ReferenceArea,
   Legend,
 } from "recharts";
 import { ANNOTATIONS } from "../lib/constants";
@@ -24,14 +25,20 @@ interface TimelineRow {
 export function TimelineChart({ data }: { data: TimelineRow[] }) {
   return (
     <Card
-      className="lg:col-span-2"
+      className=""
       title="GSSI Timeline"
-      subtitle="Historical index (2018–2024) with 3-month forecast"
+      subtitle="Historical index with 3-month forecast — zone bands show LOW / MEDIUM / HIGH thresholds"
     >
-      <div className="h-[340px]">
+      <div className="h-[380px]">
         <ResponsiveContainer width="100%" height="100%">
-          <LineChart data={data}>
+          <LineChart data={data} margin={{ top: 5, right: 10, bottom: 5, left: 0 }}>
             <CartesianGrid strokeDasharray="3 3" />
+
+            {/* Zone background bands */}
+            <ReferenceArea y1={0} y2={0.40} fill="#22c55e" fillOpacity={0.04} />
+            <ReferenceArea y1={0.40} y2={0.65} fill="#f59e0b" fillOpacity={0.05} />
+            <ReferenceArea y1={0.65} y2={0.85} fill="#ef4444" fillOpacity={0.05} />
+
             <XAxis
               dataKey="date"
               tickFormatter={fmtDateShort}
@@ -40,14 +47,14 @@ export function TimelineChart({ data }: { data: TimelineRow[] }) {
               minTickGap={40}
             />
             <YAxis
-              domain={[0, 0.8]}
+              domain={[0, 0.85]}
               tick={{ fontSize: 10 }}
               tickFormatter={(v: number) => v.toFixed(1)}
             />
             <Tooltip content={<GSSITooltip />} />
 
-            <ReferenceLine y={0.65} stroke="#ef4444" strokeDasharray="6 3" strokeWidth={1} label={{ value: "HIGH ≥ 0.65", position: "right", fill: "#ef444499", fontSize: 9 }} />
-            <ReferenceLine y={0.40} stroke="#f59e0b" strokeDasharray="6 3" strokeWidth={1} label={{ value: "MED ≥ 0.40", position: "right", fill: "#f59e0b99", fontSize: 9 }} />
+            <ReferenceLine y={0.65} stroke="#ef4444" strokeDasharray="6 3" strokeWidth={1} label={{ value: "HIGH ≥ 0.65", position: "right", fill: "#ef444480", fontSize: 9 }} />
+            <ReferenceLine y={0.40} stroke="#f59e0b" strokeDasharray="6 3" strokeWidth={1} label={{ value: "MED ≥ 0.40", position: "right", fill: "#f59e0b80", fontSize: 9 }} />
 
             {ANNOTATIONS.map((a) => (
               <ReferenceLine
@@ -61,6 +68,7 @@ export function TimelineChart({ data }: { data: TimelineRow[] }) {
                   position: "top",
                   fill: a.color,
                   fontSize: 9,
+                  fontWeight: 600,
                 }}
               />
             ))}
@@ -69,9 +77,9 @@ export function TimelineChart({ data }: { data: TimelineRow[] }) {
               type="monotone"
               dataKey="gssi"
               stroke="#3b82f6"
-              strokeWidth={2}
+              strokeWidth={2.5}
               dot={false}
-              name="GSSI"
+              name="GSSI (Historical)"
               connectNulls={false}
             />
 
@@ -79,14 +87,14 @@ export function TimelineChart({ data }: { data: TimelineRow[] }) {
               type="monotone"
               dataKey="forecast"
               stroke="#22c55e"
-              strokeWidth={2}
+              strokeWidth={2.5}
               strokeDasharray="8 4"
-              dot={{ r: 4, fill: "#22c55e" }}
-              name="Forecast"
+              dot={{ r: 4, fill: "#22c55e", strokeWidth: 2, stroke: "#141920" }}
+              name="Forecast (3-month)"
               connectNulls
             />
 
-            <Legend wrapperStyle={{ fontSize: 11, paddingTop: 8 }} />
+            <Legend wrapperStyle={{ fontSize: 11, paddingTop: 12 }} />
           </LineChart>
         </ResponsiveContainer>
       </div>

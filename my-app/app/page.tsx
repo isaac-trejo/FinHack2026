@@ -7,15 +7,17 @@ import { API_BASE } from "./lib/constants";
 import { round4 } from "./lib/helpers";
 import type { DashboardData } from "./lib/types";
 
-import { Header } from "./components/Header";
-import { ForecastSpotlight } from "./components/ForecastSpotlight";
+import { HeroSection } from "./components/HeroSection";
 import { TimelineChart } from "./components/TimelineChart";
-import { DataSources } from "./components/DataSources";
+import { ForecastSpotlight } from "./components/ForecastSpotlight";
+import { StressDrivers } from "./components/StressDrivers";
 import { LeadingIndicatorChart } from "./components/LeadingIndicatorChart";
 import { MarketVolatilityChart } from "./components/MarketVolatilityChart";
 import { ComponentContribution } from "./components/ComponentContribution";
 import { PortfolioRecommendations } from "./components/PortfolioRecommendations";
+import { DataSources } from "./components/DataSources";
 import { Footer } from "./components/Footer";
+import { ScrollFadeIn } from "./components/ScrollFadeIn";
 
 // ═════════════════════════════════════════════════════════════════════════════
 // MAIN DASHBOARD
@@ -159,20 +161,62 @@ export default function Dashboard() {
   const zone = data.current.zone;
 
   return (
-    <div className="min-h-screen bg-background px-4 py-6 font-sans sm:px-6 lg:px-8">
-      <Header data={data} />
-      <ForecastSpotlight forecast={data.forecast} />
+    <div className="min-h-screen bg-background px-4 py-8 font-sans md:px-6 lg:px-8">
+      <div className="flex flex-col items-center space-y-14">
+        {/* ═══ 1. HERO — What is happening (widest) ═══ */}
+        <ScrollFadeIn className="w-full max-w-6xl">
+          <HeroSection data={data} />
+        </ScrollFadeIn>
 
-      <div className="grid gap-6 lg:grid-cols-3">
-        <TimelineChart data={timelineData} />
-        <DataSources weights={data.weights} />
-        <LeadingIndicatorChart history={data.history} />
-        <MarketVolatilityChart history={data.history} />
-        <ComponentContribution data={componentData} />
+        {/* ═══ 2. TIMELINE — Full picture ═══ */}
+        <ScrollFadeIn className="w-full max-w-5xl">
+          <TimelineChart data={timelineData} />
+        </ScrollFadeIn>
+
+        {/* ═══ 3. FORECAST — What will happen next ═══ */}
+        <ScrollFadeIn className="w-full max-w-4xl">
+          <ForecastSpotlight forecast={data.forecast} currentGssi={data.current.gssi} />
+        </ScrollFadeIn>
+
+        {/* ═══ 4. RECOMMENDED ACTIONS — What to do ═══ */}
+        <ScrollFadeIn className="w-full max-w-3xl">
+          <PortfolioRecommendations zone={zone} gssi={data.current.gssi} />
+        </ScrollFadeIn>
+
+        {/* ═══ 5. STRESS DRIVERS — Why it's happening ═══ */}
+        <ScrollFadeIn className="w-full max-w-3xl">
+          <StressDrivers data={data} />
+        </ScrollFadeIn>
+
+        {/* ═══ 6. DEEP DIVE — Supporting analysis ═══ */}
+        <ScrollFadeIn className="w-full max-w-4xl">
+          <div className="mb-3">
+            <h2 className="text-xs font-semibold uppercase tracking-widest text-muted/60">
+              Deep Dive
+            </h2>
+          </div>
+          <div className="space-y-6">
+            <ScrollFadeIn>
+              <LeadingIndicatorChart history={data.history} />
+            </ScrollFadeIn>
+            <ScrollFadeIn>
+              <MarketVolatilityChart history={data.history} />
+            </ScrollFadeIn>
+            <ScrollFadeIn>
+              <ComponentContribution data={componentData} />
+            </ScrollFadeIn>
+          </div>
+        </ScrollFadeIn>
+
+        {/* ═══ 7. DATA SOURCES — Reference (narrowest) ═══ */}
+        <ScrollFadeIn className="w-full max-w-2xl">
+          <DataSources weights={data.weights} />
+        </ScrollFadeIn>
       </div>
 
-      <PortfolioRecommendations zone={zone} gssi={data.current.gssi} />
-      <Footer />
+      <div className="mx-auto mt-12 max-w-2xl">
+        <Footer />
+      </div>
     </div>
   );
 }

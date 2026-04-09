@@ -1,6 +1,30 @@
 @import "tailwindcss";
 
+/* ── Logo theme swap ───────────────────────────────────────────────  */
+.logo-light { display: block; }
+.logo-dark  { display: none;  }
+.dark .logo-light { display: none;  }
+.dark .logo-dark  { display: block; }
+
+/* ── Light mode (default) ─────────────────────────────────────────── */
 :root {
+  --background: #f8f9fb;
+  --foreground: #1a1d23;
+  --card: #ffffff;
+  --card-border: #e2e5ea;
+  --green: #16a34a;
+  --amber: #d97706;
+  --red: #dc2626;
+  --muted: #6b7280;
+  --tooltip-bg: #ffffff;
+  --tooltip-text: #1a1d23;
+  --tooltip-sub: #6b7280;
+  --chart-grid: #e2e5ea;
+  --chart-text: #6b7280;
+}
+
+/* ── Dark mode ────────────────────────────────────────────────────── */
+.dark {
   --background: #0b0e11;
   --foreground: #e1e4e8;
   --card: #141920;
@@ -9,6 +33,11 @@
   --amber: #f59e0b;
   --red: #ef4444;
   --muted: #6b7280;
+  --tooltip-bg: #1a1f28;
+  --tooltip-text: #ffffff;
+  --tooltip-sub: #9ca3af;
+  --chart-grid: #1e2530;
+  --chart-text: #6b7280;
 }
 
 @theme inline {
@@ -20,6 +49,9 @@
   --color-gssi-amber: var(--amber);
   --color-gssi-red: var(--red);
   --color-muted: var(--muted);
+  --color-tooltip-bg: var(--tooltip-bg);
+  --color-tooltip-text: var(--tooltip-text);
+  --color-tooltip-sub: var(--tooltip-sub);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
@@ -30,11 +62,37 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
-/* Recharts overrides for dark theme */
+/* Recharts overrides — theme-aware */
 .recharts-cartesian-grid line {
-  stroke: #1e2530;
+  stroke: var(--chart-grid);
 }
 .recharts-text {
-  fill: #6b7280;
+  fill: var(--chart-text);
   font-size: 11px;
 }
+
+/* Animations */
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slide-up {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.6s ease-out both;
+}
+
+.animate-slide-up {
+  animation: slide-up 0.5s ease-out both;
+}
+
+/* Section stagger delays */
+.section-delay-1 { animation-delay: 0.1s; }
+.section-delay-2 { animation-delay: 0.2s; }
+.section-delay-3 { animation-delay: 0.3s; }
+.section-delay-4 { animation-delay: 0.4s; }
+.section-delay-5 { animation-delay: 0.5s; }

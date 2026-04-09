@@ -12,8 +12,7 @@ export function PortfolioRecommendations({
 }) {
   return (
     <Card
-      className="mt-6"
-      title="Portfolio Recommendations"
+      title="Recommended Actions"
       subtitle={`Dynamic actions based on current zone: ${zone}`}
     >
       <div

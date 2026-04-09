@@ -13,7 +13,7 @@ export function Card({
 }) {
   return (
     <div
-      className={`rounded-xl border border-card-border bg-card p-5 ${className}`}
+      className={`rounded-xl border border-card-border bg-card p-5 shadow-sm ${className}`}
     >
       {title && (
         <div className="mb-4">
