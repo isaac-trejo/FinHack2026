@@ -63,7 +63,7 @@ python app.py
 ```
 
 ### Frontend
-
+In a separte terminal:
 ```bash
 cd my-app
 npm install
